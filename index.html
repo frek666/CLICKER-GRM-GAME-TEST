@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="telegram:site" content="@your_bot_username">
+    <title>Telegram Clicker Game</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="user-info">
+                <img id="user-photo" src="" alt="Аватар">
+                <div>
+                    <h1 id="user-name">Игрок</h1>
+                    <p id="user-id">ID: ---</p>
+                </div>
+            </div>
+            <div class="stats">
+                <div class="stat-item">
+                    <i class="fas fa-trophy"></i>
+                    <span id="level">Уровень: 1</span>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <div class="clicker-section">
+                <div class="score-display">
+                    <h2>Баланс</h2>
+                    <div class="balance">
+                        <i class="fas fa-coins"></i>
+                        <span id="score">0</span>
+                    </div>
+                    <p class="income">Доход в секунду: <span id="income-per-second">0</span></p>
+                </div>
+
+                <div class="click-area" id="click-area">
+                    <div class="click-animation" id="click-animation"></div>
+                    <i class="fas fa-mouse-pointer click-icon"></i>
+                    <p>Кликни меня!</p>
+                </div>
+
+                <div class="click-info">
+                    <p>Сила клика: <span id="click-power">1</span></p>
+                    <p>Всего кликов: <span id="total-clicks">0</span></p>
+                </div>
+            </div>
+
+            <div class="upgrades-section">
+                <h3><i class="fas fa-shopping-cart"></i> Улучшения</h3>
+                
+                <div class="upgrade-category">
+                    <h4><i class="fas fa-mouse"></i> Улучшение клика</h4>
+                    <div class="upgrade-item">
+                        <div class="upgrade-info">
+                            <h5>Усиленный палец</h5>
+                            <p>+1 к силе клика</p>
+                            <p class="upgrade-count">Куплено: <span id="upgrade-1-count">0</span></p>
+                        </div>
+                        <button class="buy-btn" data-upgrade="1">
+                            <i class="fas fa-bolt"></i>
+                            <span id="upgrade-1-price">10</span> монет
+                        </button>
+                    </div>
+
+                    <div class="upgrade-item">
+                        <div class="upgrade-info">
+                            <h5>Золотая мышь</h5>
+                            <p>+5 к силе клика</p>
+                            <p class="upgrade-count">Куплено: <span id="upgrade-2-count">0</span></p>
+                        </div>
+                        <button class="buy-btn" data-upgrade="2">
+                            <i class="fas fa-bolt"></i>
+                            <span id="upgrade-2-price">100</span> монет
+                        </button>
+                    </div>
+                </div>
+
+                <div class="upgrade-category">
+                    <h4><i class="fas fa-industry"></i> Автоматические добытчики</h4>
+                    
+                    <div class="upgrade-item">
+                        <div class="upgrade-info">
+                            <h5>Маленькая ферма</h5>
+                            <p>+1 монет/сек</p>
+                            <p class="upgrade-count">Куплено: <span id="auto-1-count">0</span></p>
+                        </div>
+                        <button class="buy-btn" data-upgrade="auto1">
+                            <i class="fas fa-robot"></i>
+                            <span id="auto-1-price">50</span> монет
+                        </button>
+                    </div>
+
+                    <div class="upgrade-item">
+                        <div class="upgrade-info">
+                            <h5>Фабрика</h5>
+                            <p>+10 монет/сек</p>
+                            <p class="upgrade-count">Куплено: <span id="auto-2-count">0</span></p>
+                        </div>
+                        <button class="buy-btn" data-upgrade="auto2">
+                            <i class="fas fa-robot"></i>
+                            <span id="auto-2-price">500</span> монет
+                        </button>
+                    </div>
+
+                    <div class="upgrade-item">
+                        <div class="upgrade-info">
+                            <h5>Завод</h5>
+                            <p>+50 монет/сек</p>
+                            <p class="upgrade-count">Куплено: <span id="auto-3-count">0</span></p>
+                        </div>
+                        <button class="buy-btn" data-upgrade="auto3">
+                            <i class="fas fa-robot"></i>
+                            <span id="auto-3-price">2500</span> монет
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="achievements-section">
+                <h3><i class="fas fa-award"></i> Достижения</h3>
+                <div class="achievements-grid">
+                    <div class="achievement" id="achievement-100">
+                        <i class="fas fa-coins"></i>
+                        <p>100 кликов</p>
+                    </div>
+                    <div class="achievement" id="achievement-1000">
+                        <i class="fas fa-star"></i>
+                        <p>1000 кликов</p>
+                    </div>
+                    <div class="achievement" id="achievement-10000">
+                        <i class="fas fa-crown"></i>
+                        <p>10000 кликов</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <div class="footer-buttons">
+                <button id="save-btn" class="footer-btn">
+                    <i class="fas fa-save"></i> Сохранить
+                </button>
+                <button id="reset-btn" class="footer-btn reset">
+                    <i class="fas fa-redo"></i> Сбросить
+                </button>
+                <button id="share-btn" class="footer-btn">
+                    <i class="fas fa-share-alt"></i> Поделиться
+                </button>
+            </div>
+            <p class="game-info">Игра автоматически сохраняется каждые 30 секунд</p>
+        </footer>
+    </div>
+
+    <div id="notification" class="notification"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
