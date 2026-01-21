@@ -2,1276 +2,190 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Telegram Руда Кликер</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brainrot Clicker | Токсичный кликер</title>
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            -webkit-user-select: none;
-            user-select: none;
-        }
-
-        :root {
-            --tg-blue: #0088cc;
-            --tg-dark: #17212b;
-            --tg-darker: #0f1620;
-            --tg-light: #242f3d;
-            --tg-text: #ffffff;
-            --tg-secondary: #6b7b8c;
-            --tg-green: #2ea043;
-            --tg-gold: #ffb347;
-            --tg-red: #ff3b30;
-        }
-
-        body {
-            background-color: var(--tg-darker);
-            color: var(--tg-text);
-            min-height: 100vh;
-            overflow-x: hidden;
-            touch-action: manipulation;
-        }
-
-        .container {
-            max-width: 100%;
-            margin: 0 auto;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            background: linear-gradient(135deg, var(--tg-dark), var(--tg-light));
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            border-left: 4px solid var(--tg-blue);
-            flex-wrap: wrap;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .logo-icon {
-            font-size: 2rem;
-            color: var(--tg-blue);
-            animation: pulse 2s infinite;
-        }
-
-        .logo-text h1 {
-            font-size: 1.3rem;
-            margin-bottom: 3px;
-        }
-
-        .logo-text p {
-            color: var(--tg-secondary);
-            font-size: 0.8rem;
-        }
-
-        .stats {
-            display: flex;
-            gap: 15px;
-            text-align: right;
-            width: 100%;
-            justify-content: space-between;
-            margin-top: 10px;
-        }
-
-        .stat-box {
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-        }
-
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--tg-gold);
-        }
-
-        .stat-label {
-            font-size: 0.8rem;
-            color: var(--tg-secondary);
-        }
-
-        .main-content {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .clicker-section {
-            background-color: var(--tg-dark);
-            border-radius: 12px;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            order: 1;
-        }
-
-        .clicker-title {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            color: var(--tg-gold);
-            text-align: center;
-        }
-
-        .ore-container {
-            position: relative;
-            margin: 15px 0;
-            cursor: pointer;
-            transition: transform 0.1s;
-            touch-action: manipulation;
-            width: 200px;
-            height: 200px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .ore {
-            font-size: 7rem;
-            color: var(--tg-blue);
-            filter: drop-shadow(0 0 15px rgba(0, 136, 204, 0.5));
-            animation: float 4s ease-in-out infinite;
-            transition: transform 0.2s;
-            pointer-events: none;
-        }
-
-        .ore.active {
-            transform: scale(0.9);
-        }
-
-        .click-effect {
-            position: absolute;
-            font-size: 1.8rem;
-            color: var(--tg-gold);
-            font-weight: bold;
-            pointer-events: none;
-            animation: floatUp 1s forwards;
-            opacity: 0;
-            z-index: 10;
-        }
-
-        .click-info {
-            margin-top: 15px;
-            text-align: center;
-            color: var(--tg-secondary);
-            font-size: 0.85rem;
-            line-height: 1.4;
-        }
-
-        .upgrades-section {
-            background-color: var(--tg-dark);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            order: 2;
-        }
-
-        .section-title {
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            color: var(--tg-blue);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .upgrades-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            overflow-y: auto;
-            max-height: 400px;
-            padding-right: 5px;
-        }
-
-        /* Стили для скроллбара */
-        .upgrades-list::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .upgrades-list::-webkit-scrollbar-track {
-            background: var(--tg-darker);
-            border-radius: 10px;
-        }
-
-        .upgrades-list::-webkit-scrollbar-thumb {
-            background: var(--tg-blue);
-            border-radius: 10px;
-        }
-
-        .upgrade-item {
-            background-color: var(--tg-light);
-            border-radius: 10px;
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.3s;
-            border-left: 4px solid transparent;
-        }
-
-        .upgrade-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .upgrade-item.unlocked {
-            border-left-color: var(--tg-green);
-        }
-
-        .upgrade-item.locked {
-            opacity: 0.7;
-            filter: grayscale(0.5);
-        }
-
-        .upgrade-icon {
-            font-size: 2rem;
-            color: var(--tg-gold);
-        }
-
-        .upgrade-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .upgrade-name {
-            font-size: 1rem;
-            margin-bottom: 3px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .upgrade-desc {
-            font-size: 0.8rem;
-            color: var(--tg-secondary);
-            margin-bottom: 6px;
-            line-height: 1.2;
-        }
-
-        .upgrade-stats {
-            display: flex;
-            gap: 10px;
-            font-size: 0.75rem;
-        }
-
-        .upgrade-stat {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            color: var(--tg-gold);
-        }
-
-        .upgrade-cost {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: var(--tg-green);
-            min-width: 70px;
-            text-align: right;
-            margin-right: 8px;
-        }
-
-        .upgrade-btn {
-            background-color: var(--tg-blue);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.3s;
-            font-size: 0.9rem;
-            white-space: nowrap;
-        }
-
-        .upgrade-btn:active {
-            transform: scale(0.95);
-        }
-
-        .upgrade-btn:hover:not(:disabled) {
-            background-color: #0077b3;
-        }
-
-        .upgrade-btn:disabled {
-            background-color: var(--tg-secondary);
-            cursor: not-allowed;
-        }
-
-        .achievements-section {
-            background-color: var(--tg-dark);
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            order: 3;
-        }
-
-        .achievements-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        @media (max-width: 400px) {
-            .achievements-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .achievement-card {
-            background-color: var(--tg-light);
-            border-radius: 10px;
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transition: all 0.3s;
-        }
-
-        .achievement-card.unlocked {
-            border-left: 4px solid var(--tg-gold);
-        }
-
-        .achievement-card.locked {
-            opacity: 0.6;
-        }
-
-        .achievement-icon {
-            font-size: 2rem;
-            color: var(--tg-gold);
-        }
-
-        .achievement-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .achievement-name {
-            font-size: 1rem;
-            margin-bottom: 3px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .achievement-desc {
-            font-size: 0.8rem;
-            color: var(--tg-secondary);
-            margin-bottom: 8px;
-            line-height: 1.2;
-        }
-
-        .achievement-progress {
-            height: 6px;
-            background-color: var(--tg-dark);
-            border-radius: 3px;
-            overflow: hidden;
-            margin-bottom: 8px;
-        }
-
-        .achievement-progress-bar {
-            height: 100%;
-            background-color: var(--tg-green);
-            transition: width 0.5s;
-        }
-
-        .achievement-reward {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            color: var(--tg-gold);
-            font-weight: bold;
-            font-size: 0.85rem;
-        }
-
-        .auto-miners {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-top: 15px;
-            justify-content: center;
-            width: 100%;
-        }
-
-        .auto-miner {
-            background-color: var(--tg-light);
-            border-radius: 10px;
-            padding: 12px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex: 1;
-            min-width: 140px;
-            max-width: 180px;
-        }
-
-        .auto-miner-icon {
-            font-size: 1.7rem;
-            color: var(--tg-blue);
-        }
-
-        .auto-miner-info h4 {
-            font-size: 0.9rem;
-            margin-bottom: 3px;
-        }
-
-        .auto-miner-info p {
-            font-size: 0.75rem;
-            color: var(--tg-secondary);
-        }
-
-        .footer {
-            text-align: center;
-            padding: 15px;
-            color: var(--tg-secondary);
-            font-size: 0.8rem;
-            border-top: 1px solid var(--tg-light);
-            margin-top: 10px;
-            order: 4;
-        }
-
-        /* Кнопка сброса игры */
-        .reset-btn {
-            position: fixed;
-            bottom: 15px;
-            right: 15px;
-            background-color: var(--tg-red);
-            color: white;
-            border: none;
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.2rem;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-            z-index: 100;
-            transition: all 0.3s;
-        }
-
-        .reset-btn:active {
-            transform: scale(0.9);
-        }
-
-        /* Анимации */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes float {
-            0% { transform: translateY(0px) rotate(0deg); }
-            50% { transform: translateY(-15px) rotate(3deg); }
-            100% { transform: translateY(0px) rotate(0deg); }
-        }
-
-        @keyframes floatUp {
-            0% {
-                transform: translateY(0);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-40px);
-                opacity: 0;
-            }
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-3px); }
-            75% { transform: translateX(3px); }
-        }
-
-        .shake {
-            animation: shake 0.2s;
-        }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 15px;
-            left: 15px;
-            background-color: var(--tg-green);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transform: translateY(-100px);
-            transition: transform 0.5s;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .notification.show {
-            transform: translateY(0);
-        }
-
-        .notification-icon {
-            font-size: 1.3rem;
-        }
-
-        /* Табы для мобильного интерфейса */
-        .tab-container {
-            display: flex;
-            justify-content: space-around;
-            background-color: var(--tg-dark);
-            border-radius: 12px;
-            margin-bottom: 10px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-            position: sticky;
-            top: 0;
-            z-index: 50;
-        }
-
-        .tab {
-            flex: 1;
-            text-align: center;
-            padding: 12px 5px;
-            font-weight: bold;
-            color: var(--tg-secondary);
-            cursor: pointer;
-            transition: all 0.3s;
-            border-bottom: 3px solid transparent;
-            font-size: 0.9rem;
-        }
-
-        .tab.active {
-            color: var(--tg-blue);
-            border-bottom-color: var(--tg-blue);
-            background-color: rgba(0, 136, 204, 0.1);
-        }
-
-        .tab-content {
-            display: none;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        /* Оптимизация для очень маленьких экранов */
-        @media (max-width: 360px) {
-            .ore-container {
-                width: 180px;
-                height: 180px;
-            }
-            
-            .ore {
-                font-size: 6rem;
-            }
-            
-            .upgrade-item {
-                flex-wrap: wrap;
-            }
-            
-            .upgrade-cost {
-                min-width: 100%;
-                text-align: left;
-                margin-top: 5px;
-                margin-bottom: 5px;
-            }
-            
-            .upgrade-btn {
-                width: 100%;
-            }
-        }
-
-        /* Для планшетов и больших экранов */
-        @media (min-width: 768px) {
-            .container {
-                padding: 20px;
-                max-width: 768px;
-            }
-            
-            .tab-container {
-                display: none;
-            }
-            
-            .tab-content {
-                display: block !important;
-            }
-            
-            .main-content {
-                display: grid;
-                grid-template-columns: 1fr 1fr;
-                gap: 20px;
-            }
-            
-            .clicker-section {
-                grid-column: 1 / -1;
-                order: 1;
-            }
-            
-            .upgrades-section {
-                order: 2;
-            }
-            
-            .achievements-section {
-                order: 3;
-                grid-column: 1 / -1;
-            }
-        }
-    </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
     <div class="container">
-        <!-- Шапка с основной информацией -->
-        <div class="header">
-            <div class="logo">
-                <div class="logo-icon">
-                    <i class="fas fa-mountain"></i>
-                </div>
-                <div class="logo-text">
-                    <h1>Telegram Руда Кликер</h1>
-                    <p>Добывайте руду, улучшайте шахту!</p>
+        <header class="header">
+            <div class="user-info">
+                <img id="user-avatar" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" alt="Avatar">
+                <div>
+                    <h2 id="user-name">Игрок</h2>
+                    <p>Уровень: <span id="user-level">1</span></p>
                 </div>
             </div>
-            <div class="stats">
-                <div class="stat-box">
-                    <div class="stat-value" id="ore-count">0</div>
-                    <div class="stat-label">Руда</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value" id="ore-per-click">1</div>
-                    <div class="stat-label">За клик</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-value" id="ore-per-second">0</div>
-                    <div class="stat-label">В секунду</div>
-                </div>
+            <div class="balance">
+                <h3>💰 <span id="money">0</span> <i class="fas fa-brain"></i></h3>
+                <p>В секунду: <span id="per-second">0</span></p>
             </div>
-        </div>
+        </header>
 
-        <!-- Табы для мобильной навигации -->
-        <div class="tab-container">
-            <div class="tab active" data-tab="clicker">Добыча</div>
-            <div class="tab" data-tab="upgrades">Улучшения</div>
-            <div class="tab" data-tab="achievements">Достижения</div>
-        </div>
-
-        <!-- Основной контент -->
-        <div class="main-content">
-            <!-- Секция кликера -->
-            <section class="clicker-section tab-content active" id="clicker-tab">
-                <h2 class="clicker-title">Кликайте по руде!</h2>
-                <div class="ore-container" id="ore-container">
-                    <div class="ore" id="ore">
-                        <i class="fas fa-gem"></i>
+        <main class="game-area">
+            <div class="clicker-section">
+                <div class="brainrot-display">
+                    <div class="brainrot-text">
+                        <span class="glitch" data-text="SKIBIDI">SKIBIDI</span>
+                        <span class="glitch" data-text="TOILET">TOILET</span>
+                        <span class="glitch" data-text="GYATT">GYATT</span>
+                    </div>
+                    <button id="click-button" class="brainrot-btn">
+                        <div class="btn-inner">
+                            <i class="fas fa-skull-crossbones"></i>
+                            <span>КЛИКНУТЬ</span>
+                            <div class="btn-effect"></div>
+                        </div>
+                    </button>
+                    <div class="click-power">
+                        Сила клика: <span id="click-power">1</span>
                     </div>
                 </div>
-                <div class="click-info">
-                    <p>Кликайте на руду для добычи. Улучшайте шахту для увеличения добычи!</p>
-                    <p>Автоматических шахт: <span id="miner-count">0</span></p>
+
+                <div class="stats">
+                    <div class="stat-item">
+                        <h4>Всего кликов</h4>
+                        <p id="total-clicks">0</p>
+                    </div>
+                    <div class="stat-item">
+                        <h4>Рекорд</h4>
+                        <p id="record-clicks">0</p>
+                    </div>
+                    <div class="stat-item">
+                        <h4>Время игры</h4>
+                        <p id="play-time">1:01</p>
+                    </div>
                 </div>
+            </div>
+
+            <div class="shop-section">
+                <h3><i class="fas fa-store"></i> МАГАЗИН БРЕЙНРОТА</h3>
                 
-                <!-- Автоматические шахты -->
-                <div class="auto-miners">
-                    <div class="auto-miner">
-                        <div class="auto-miner-icon">
-                            <i class="fas fa-robot"></i>
+                <div class="upgrades">
+                    <div class="upgrade-item" data-id="1">
+                        <div class="upgrade-icon"><i class="fas fa-mouse-pointer"></i></div>
+                        <div class="upgrade-info">
+                            <h4>Улучшенный клик</h4>
+                            <p>+1 к силе клика</p>
                         </div>
-                        <div class="auto-miner-info">
-                            <h4>Авто-шахты</h4>
-                            <p>Добывают руду автоматически</p>
-                        </div>
+                        <button class="buy-btn" data-price="10">Купить за 10</button>
                     </div>
-                    <div class="auto-miner">
-                        <div class="auto-miner-icon">
-                            <i class="fas fa-bolt"></i>
+
+                    <div class="upgrade-item" data-id="2">
+                        <div class="upgrade-icon"><i class="fas fa-robot"></i></div>
+                        <div class="upgrade-info">
+                            <h4>Автокликер</h4>
+                            <p>Автоматически кликает 1 раз/сек</p>
                         </div>
-                        <div class="auto-miner-info">
-                            <h4>Бустеры</h4>
-                            <p>Временно увеличивают добычу</p>
+                        <button class="buy-btn" data-price="50">Купить за 50</button>
+                    </div>
+
+                    <div class="upgrade-item" data-id="3">
+                        <div class="upgrade-icon"><i class="fas fa-bolt"></i></div>
+                        <div class="upgrade-info">
+                            <h4>Мега клик</h4>
+                            <p>Увеличивает клик в 2 раза</p>
                         </div>
+                        <button class="buy-btn" data-price="200">Купить за 200</button>
+                    </div>
+
+                    <div class="upgrade-item" data-id="4">
+                        <div class="upgrade-icon"><i class="fas fa-crown"></i></div>
+                        <div class="upgrade-info">
+                            <h4>Sigma Boost</h4>
+                            <p>+5 к силе клика навсегда</p>
+                        </div>
+                        <button class="buy-btn" data-price="1000">Купить за 1000</button>
                     </div>
                 </div>
-            </section>
-
-            <!-- Секция улучшений -->
-            <section class="upgrades-section tab-content" id="upgrades-tab">
-                <h2 class="section-title">
-                    <i class="fas fa-arrow-up"></i>
-                    Улучшения шахты
-                </h2>
-                <div class="upgrades-list" id="upgrades-list">
-                    <!-- Улучшения будут загружены через JavaScript -->
-                </div>
-            </section>
-
-            <!-- Секция достижений -->
-            <section class="achievements-section tab-content" id="achievements-tab">
-                <h2 class="section-title">
-                    <i class="fas fa-trophy"></i>
-                    Достижения
-                </h2>
-                <div class="achievements-grid" id="achievements-grid">
-                    <!-- Достижения будут загружены через JavaScript -->
-                </div>
-            </section>
-        </div>
-
-        <!-- Уведомления -->
-        <div class="notification" id="notification">
-            <div class="notification-icon">
-                <i class="fas fa-check-circle"></i>
             </div>
-            <div class="notification-text">Достижение получено!</div>
-        </div>
 
-        <!-- Кнопка сброса -->
-        <button class="reset-btn" id="reset-btn" title="Сбросить игру">
-            <i class="fas fa-redo"></i>
-        </button>
+            <div class="monetization-section">
+                <h3><i class="fas fa-gem"></i> ПРЕМИУМ ФИЧИ</h3>
+                
+                <div class="premium-features">
+                    <div class="premium-item">
+                        <div class="premium-icon"><i class="fas fa-rocket"></i></div>
+                        <div class="premium-info">
+                            <h4>x2 Множитель</h4>
+                            <p>Удваивает весь заработок на 24 часа</p>
+                        </div>
+                        <button class="premium-btn" data-feature="booster">
+                            <i class="fas fa-bolt"></i> 99₽
+                        </button>
+                    </div>
 
-        <!-- Футер -->
+                    <div class="premium-item">
+                        <div class="premium-icon"><i class="fas fa-shield-alt"></i></div>
+                        <div class="premium-info">
+                            <h4>Защита прогресса</h4>
+                            <p>Резервное копирование в облако</p>
+                        </div>
+                        <button class="premium-btn" data-feature="backup">
+                            <i class="fas fa-cloud"></i> 199₽
+                        </button>
+                    </div>
+
+                    <div class="premium-item">
+                        <div class="premium-icon"><i class="fas fa-infinity"></i></div>
+                        <div class="premium-info">
+                            <h4>Неограниченная энергия</h4>
+                            <p>Убирает ограничения на 7 дней</p>
+                        </div>
+                        <button class="premium-btn" data-feature="unlimited">
+                            <i class="fas fa-infinity"></i> 299₽
+                        </button>
+                    </div>
+                </div>
+
+                <div class="referral">
+                    <h4><i class="fas fa-user-plus"></i> Пригласи друга</h4>
+                    <p>Получи 100 монет за каждого приглашенного</p>
+                    <div class="referral-link">
+                        <input type="text" id="ref-link" readonly="" value="Загрузка...">
+                        <button id="copy-ref"><i class="fas fa-copy"></i></button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
         <footer class="footer">
-            <p>Telegram Руда Кликер &copy; 2023 | Для мобильных устройств</p>
+            <div class="notifications" id="notifications"></div>
+            <div class="links">
+                <a href="#" id="leaderboard"><i class="fas fa-trophy"></i> Таблица лидеров</a>
+                <a href="#" id="achievements"><i class="fas fa-medal"></i> Достижения</a>
+                <a href="#" id="settings"><i class="fas fa-cog"></i> Настройки</a>
+            </div>
         </footer>
     </div>
 
-    <script>
-        // Игровые данные
-        const game = {
-            ore: 100,
-            orePerClick: 1,
-            orePerSecond: 0,
-            miners: 0,
-            upgrades: [
-                {
-                    id: 1,
-                    name: "Улучшенная кирка",
-                    description: "Увеличивает добычу за клик",
-                    icon: "fas fa-hammer",
-                    cost: 10,
-                    increase: 1,
-                    type: "click",
-                    level: 0,
-                    maxLevel: 10
-                },
-                {
-                    id: 2,
-                    name: "Усиленные перчатки",
-                    description: "Увеличивают силу удара",
-                    icon: "fas fa-hand-fist",
-                    cost: 50,
-                    increase: 2,
-                    type: "click",
-                    level: 0,
-                    maxLevel: 5
-                },
-                {
-                    id: 3,
-                    name: "Автоматическая шахта",
-                    description: "Добывает руду автоматически",
-                    icon: "fas fa-robot",
-                    cost: 100,
-                    increase: 1,
-                    type: "auto",
-                    level: 0,
-                    maxLevel: 20
-                },
-                {
-                    id: 4,
-                    name: "Буровая установка",
-                    description: "Увеличивает авто-добычу",
-                    icon: "fas fa-digging",
-                    cost: 500,
-                    increase: 5,
-                    type: "auto",
-                    level: 0,
-                    maxLevel: 10
-                },
-                {
-                    id: 5,
-                    name: "Взрывчатка",
-                    description: "Взрывает породу для быстрой добычи",
-                    icon: "fas fa-bomb",
-                    cost: 1000,
-                    increase: 10,
-                    type: "click",
-                    level: 0,
-                    maxLevel: 5
-                },
-                {
-                    id: 6,
-                    name: "Квантовый экстрактор",
-                    description: "Сверхэффективная добыча",
-                    icon: "fas fa-atom",
-                    cost: 5000,
-                    increase: 50,
-                    type: "auto",
-                    level: 0,
-                    maxLevel: 5
-                }
-            ],
-            achievements: [
-                {
-                    id: 1,
-                    name: "Первая руда",
-                    description: "Добудьте 10 единиц руды",
-                    icon: "fas fa-gem",
-                    goal: 10,
-                    progress: 0,
-                    reward: 50,
-                    unlocked: false
-                },
-                {
-                    id: 2,
-                    name: "Начинающий шахтер",
-                    description: "Добудьте 100 единиц руды",
-                    icon: "fas fa-helmet-safety",
-                    goal: 100,
-                    progress: 0,
-                    reward: 200,
-                    unlocked: false
-                },
-                {
-                    id: 3,
-                    name: "Промышленник",
-                    description: "Добудьте 1000 единиц руды",
-                    icon: "fas fa-industry",
-                    goal: 1000,
-                    progress: 0,
-                    reward: 1000,
-                    unlocked: false
-                },
-                {
-                    id: 4,
-                    name: "Коллекционер улучшений",
-                    description: "Купите 5 улучшений",
-                    icon: "fas fa-shopping-cart",
-                    goal: 5,
-                    progress: 0,
-                    reward: 300,
-                    unlocked: false
-                },
-                {
-                    id: 5,
-                    name: "Мастер улучшений",
-                    description: "Купите 10 улучшений",
-                    icon: "fas fa-tools",
-                    goal: 10,
-                    progress: 0,
-                    reward: 1000,
-                    unlocked: false
-                },
-                {
-                    id: 6,
-                    name: "Автоматизатор",
-                    description: "Купите 5 авто-шахт",
-                    icon: "fas fa-robot",
-                    goal: 5,
-                    progress: 0,
-                    reward: 800,
-                    unlocked: false
-                }
-            ],
-            totalClicks: 0,
-            totalUpgrades: 0
-        };
+    <!-- Модальные окна -->
+    <div id="leaderboard-modal" class="modal">
+        <div class="modal-content">
+            <h2>🏆 ТОП ИГРОКОВ</h2>
+            <div id="leaderboard-list"></div>
+            <button class="close-modal">Закрыть</button>
+        </div>
+    </div>
 
-        // Инициализация игры
-        document.addEventListener('DOMContentLoaded', function() {
-            loadGame();
-            renderUpgrades();
-            renderAchievements();
-            updateStats();
-            setupEventListeners();
-            startGameLoop();
-            setupTabs();
-            
-            // Загружаем сохраненную игру
-            if (localStorage.getItem('oreClickerSave')) {
-                loadSave();
-            }
-        });
+    <div id="achievements-modal" class="modal">
+        <div class="modal-content">
+            <h2>🎖️ ДОСТИЖЕНИЯ</h2>
+            <div id="achievements-list"></div>
+            <button class="close-modal">Закрыть</button>
+        </div>
+    </div>
 
-        // Настройка вкладок для мобильного интерфейса
-        function setupTabs() {
-            const tabs = document.querySelectorAll('.tab');
-            const tabContents = document.querySelectorAll('.tab-content');
-            
-            tabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    const tabId = this.getAttribute('data-tab');
-                    
-                    // Убираем активный класс у всех вкладок
-                    tabs.forEach(t => t.classList.remove('active'));
-                    tabContents.forEach(c => c.classList.remove('active'));
-                    
-                    // Добавляем активный класс текущей вкладке
-                    this.classList.add('active');
-                    document.getElementById(`${tabId}-tab`).classList.add('active');
-                });
-            });
-        }
+    <div id="payment-modal" class="modal">
+        <div class="modal-content">
+            <h2>💳 Покупка</h2>
+            <div id="payment-info"></div>
+            <button class="close-modal">Отмена</button>
+        </div>
+    </div>
 
-        // Загрузка сохраненной игры
-        function loadSave() {
-            const save = JSON.parse(localStorage.getItem('oreClickerSave'));
-            if (save) {
-                game.ore = save.ore || 0;
-                game.orePerClick = save.orePerClick || 1;
-                game.orePerSecond = save.orePerSecond || 0;
-                game.miners = save.miners || 0;
-                game.upgrades = save.upgrades || game.upgrades;
-                game.achievements = save.achievements || game.achievements;
-                game.totalClicks = save.totalClicks || 0;
-                game.totalUpgrades = save.totalUpgrades || 0;
-                
-                updateStats();
-                renderUpgrades();
-                renderAchievements();
-            }
-        }
-
-        // Сохранение игры
-        function saveGame() {
-            const save = {
-                ore: game.ore,
-                orePerClick: game.orePerClick,
-                orePerSecond: game.orePerSecond,
-                miners: game.miners,
-                upgrades: game.upgrades,
-                achievements: game.achievements,
-                totalClicks: game.totalClicks,
-                totalUpgrades: game.totalUpgrades,
-                timestamp: Date.now()
-            };
-            
-            localStorage.setItem('oreClickerSave', JSON.stringify(save));
-        }
-
-        // Настройка обработчиков событий
-        function setupEventListeners() {
-            // Клик по руде
-            const oreContainer = document.getElementById('ore-container');
-            const ore = document.getElementById('ore');
-            
-            // Обработчик для клика мышью
-            oreContainer.addEventListener('click', function(e) {
-                handleOreClick(e.clientX, e.clientY);
-            });
-            
-            // Обработчик для касания на мобильных устройствах
-            oreContainer.addEventListener('touchstart', function(e) {
-                e.preventDefault(); // Предотвращаем стандартное поведение
-                const touch = e.touches[0];
-                handleOreClick(touch.clientX, touch.clientY);
-            }, { passive: false });
-            
-            // Обработчик для кнопки сброса
-            document.getElementById('reset-btn').addEventListener('click', function() {
-                if (confirm("Вы уверены, что хотите сбросить всю игру? Все данные будут потеряны.")) {
-                    resetGame();
-                }
-            });
-            
-            // Авто-сохранение каждые 30 секунд
-            setInterval(saveGame, 30000);
-        }
-
-        // Обработка клика по руде
-        function handleOreClick(x, y) {
-            const ore = document.getElementById('ore');
-            const oreContainer = document.getElementById('ore-container');
-            
-            // Создаем эффект клика
-            createClickEffect(x, y);
-            
-            // Добавляем руду
-            game.ore += game.orePerClick;
-            game.totalClicks++;
-            
-            // Анимация руды
-            ore.classList.add('shake', 'active');
-            setTimeout(() => {
-                ore.classList.remove('shake');
-            }, 200);
-            
-            setTimeout(() => {
-                ore.classList.remove('active');
-            }, 100);
-            
-            // Обновляем статистику
-            updateStats();
-            
-            // Проверяем достижения
-            checkAchievements();
-            
-            // Сохраняем игру
-            saveGame();
-        }
-
-        // Создание эффекта при клике
-        function createClickEffect(x, y) {
-            const oreContainer = document.getElementById('ore-container');
-            const rect = oreContainer.getBoundingClientRect();
-            
-            const effect = document.createElement('div');
-            effect.className = 'click-effect';
-            effect.textContent = `+${game.orePerClick}`;
-            effect.style.left = `${x - rect.left}px`;
-            effect.style.top = `${y - rect.top}px`;
-            
-            oreContainer.appendChild(effect);
-            
-            // Удаляем эффект после анимации
-            setTimeout(() => effect.remove(), 1000);
-        }
-
-        // Рендеринг улучшений
-        function renderUpgrades() {
-            const upgradesList = document.getElementById('upgrades-list');
-            upgradesList.innerHTML = '';
-            
-            game.upgrades.forEach(upgrade => {
-                const upgradeElement = document.createElement('div');
-                upgradeElement.className = `upgrade-item ${upgrade.level > 0 ? 'unlocked' : ''} ${upgrade.level >= upgrade.maxLevel ? 'locked' : ''}`;
-                
-                // Рассчитываем стоимость улучшения
-                const cost = Math.floor(upgrade.cost * Math.pow(1.5, upgrade.level));
-                const canAfford = game.ore >= cost;
-                
-                upgradeElement.innerHTML = `
-                    <div class="upgrade-icon">
-                        <i class="${upgrade.icon}"></i>
-                    </div>
-                    <div class="upgrade-info">
-                        <div class="upgrade-name">${upgrade.name} (Ур. ${upgrade.level}/${upgrade.maxLevel})</div>
-                        <div class="upgrade-desc">${upgrade.description}</div>
-                        <div class="upgrade-stats">
-                            <div class="upgrade-stat">
-                                <i class="fas fa-arrow-up"></i>
-                                <span>+${upgrade.increase} ${upgrade.type === 'click' ? 'за клик' : 'в секунду'}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="upgrade-cost">${formatNumber(cost)}</div>
-                    <button class="upgrade-btn" ${!canAfford || upgrade.level >= upgrade.maxLevel ? 'disabled' : ''} data-id="${upgrade.id}">
-                        ${upgrade.level >= upgrade.maxLevel ? 'МАКС' : 'Купить'}
-                    </button>
-                `;
-                
-                upgradesList.appendChild(upgradeElement);
-            });
-            
-            // Добавляем обработчики для кнопок улучшений
-            document.querySelectorAll('.upgrade-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const id = parseInt(this.getAttribute('data-id'));
-                    buyUpgrade(id);
-                });
-            });
-        }
-
-        // Покупка улучшения
-        function buyUpgrade(id) {
-            const upgrade = game.upgrades.find(u => u.id === id);
-            if (!upgrade || upgrade.level >= upgrade.maxLevel) return;
-            
-            const cost = Math.floor(upgrade.cost * Math.pow(1.5, upgrade.level));
-            
-            if (game.ore >= cost) {
-                game.ore -= cost;
-                upgrade.level++;
-                game.totalUpgrades++;
-                
-                if (upgrade.type === 'click') {
-                    game.orePerClick += upgrade.increase;
-                } else if (upgrade.type === 'auto') {
-                    game.orePerSecond += upgrade.increase;
-                    game.miners = game.upgrades
-                        .filter(u => u.type === 'auto')
-                        .reduce((total, u) => total + (u.level * u.increase), 0);
-                }
-                
-                updateStats();
-                renderUpgrades();
-                checkAchievements();
-                saveGame();
-                
-                // Показываем уведомление
-                showNotification(`Улучшение "${upgrade.name}" куплено!`);
-            }
-        }
-
-        // Рендеринг достижений
-        function renderAchievements() {
-            const achievementsGrid = document.getElementById('achievements-grid');
-            achievementsGrid.innerHTML = '';
-            
-            game.achievements.forEach(achievement => {
-                const progress = Math.min(achievement.progress / achievement.goal * 100, 100);
-                
-                const achievementElement = document.createElement('div');
-                achievementElement.className = `achievement-card ${achievement.unlocked ? 'unlocked' : 'locked'}`;
-                
-                achievementElement.innerHTML = `
-                    <div class="achievement-icon">
-                        <i class="${achievement.icon}"></i>
-                    </div>
-                    <div class="achievement-info">
-                        <div class="achievement-name">${achievement.name} ${achievement.unlocked ? '✓' : ''}</div>
-                        <div class="achievement-desc">${achievement.description}</div>
-                        <div class="achievement-progress">
-                            <div class="achievement-progress-bar" style="width: ${progress}%"></div>
-                        </div>
-                        <div class="achievement-reward">
-                            <i class="fas fa-coins"></i>
-                            <span>Награда: ${formatNumber(achievement.reward)} руды</span>
-                        </div>
-                    </div>
-                `;
-                
-                achievementsGrid.appendChild(achievementElement);
-            });
-        }
-
-        // Проверка достижений
-        function checkAchievements() {
-            let newAchievements = 0;
-            
-            // Обновляем прогресс достижений
-            game.achievements.forEach(achievement => {
-                if (achievement.unlocked) return;
-                
-                // Устанавливаем прогресс в зависимости от типа достижения
-                if (achievement.id <= 3) {
-                    // Достижения по количеству руды
-                    achievement.progress = game.ore;
-                } else if (achievement.id === 4 || achievement.id === 5) {
-                    // Достижения по количеству улучшений
-                    achievement.progress = game.totalUpgrades;
-                } else if (achievement.id === 6) {
-                    // Достижение по количеству авто-шахт
-                    achievement.progress = game.upgrades
-                        .filter(u => u.type === 'auto')
-                        .reduce((total, u) => total + u.level, 0);
-                }
-                
-                // Проверяем, выполнено ли достижение
-                if (achievement.progress >= achievement.goal) {
-                    achievement.unlocked = true;
-                    game.ore += achievement.reward;
-                    newAchievements++;
-                    
-                    // Показываем уведомление
-                    showNotification(`Достижение "${achievement.name}" получено! +${achievement.reward} руды`);
-                }
-            });
-            
-            if (newAchievements > 0) {
-                updateStats();
-                renderAchievements();
-            }
-        }
-
-        // Обновление статистики
-        function updateStats() {
-            document.getElementById('ore-count').textContent = formatNumber(game.ore);
-            document.getElementById('ore-per-click').textContent = formatNumber(game.orePerClick);
-            document.getElementById('ore-per-second').textContent = formatNumber(game.orePerSecond);
-            document.getElementById('miner-count').textContent = game.miners;
-        }
-
-        // Игровой цикл для авто-добычи
-        function startGameLoop() {
-            setInterval(() => {
-                if (game.orePerSecond > 0) {
-                    game.ore += game.orePerSecond;
-                    updateStats();
-                    checkAchievements();
-                    saveGame();
-                }
-            }, 1000);
-        }
-
-        // Показать уведомление
-        function showNotification(text) {
-            const notification = document.getElementById('notification');
-            const notificationText = notification.querySelector('.notification-text');
-            
-            notificationText.textContent = text;
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
-        // Сброс игры
-        function resetGame() {
-            if (confirm("Вы уверены, что хотите сбросить всю игру? Все данные будут потеряны.")) {
-                localStorage.removeItem('oreClickerSave');
-                
-                // Сбрасываем все значения к начальным
-                game.ore = 0;
-                game.orePerClick = 1;
-                game.orePerSecond = 0;
-                game.miners = 0;
-                game.totalClicks = 0;
-                game.totalUpgrades = 0;
-                
-                // Сбрасываем улучшения
-                game.upgrades.forEach(upgrade => {
-                    upgrade.level = 0;
-                });
-                
-                // Сбрасываем достижения
-                game.achievements.forEach(achievement => {
-                    achievement.progress = 0;
-                    achievement.unlocked = false;
-                });
-                
-                updateStats();
-                renderUpgrades();
-                renderAchievements();
-                saveGame();
-                
-                showNotification("Игра сброшена!");
-            }
-        }
-
-        // Форматирование чисел
-        function formatNumber(num) {
-            if (num >= 1000000) {
-                return (num / 1000000).toFixed(1) + 'M';
-            }
-            if (num >= 1000) {
-                return (num / 1000).toFixed(1) + 'K';
-            }
-            return Math.floor(num);
-        }
-
-        // Загрузка игры
-        function loadGame() {
-            console.log('Игра загружена!');
-        }
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
