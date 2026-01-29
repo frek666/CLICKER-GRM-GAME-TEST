@@ -1,85 +1,599 @@
-<!-- PWA: https://bsehovac.github.io/the-cube/ -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Алиас - Игра для Telegram</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --primary-color: #3390ec;
+            --secondary-color: #2ea043;
+            --background-color: #f5f5f5;
+            --card-color: #ffffff;
+            --text-color: #333333;
+            --border-radius: 12px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 2px solid var(--primary-color);
+            margin-bottom: 30px;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin: 0;
+            font-size: 2.5rem;
+        }
+        
+        .game-area {
+            background-color: var(--card-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 25px;
+            margin-bottom: 25px;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .word-display {
+            font-size: 2.8rem;
+            text-align: center;
+            font-weight: bold;
+            margin: 30px 0;
+            color: var(--primary-color);
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .success-btn {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+        
+        .skip-btn {
+            background-color: #f0f0f0;
+            color: #666;
+        }
+        
+        .start-btn {
+            background-color: var(--primary-color);
+            color: white;
+            width: 100%;
+            font-size: 1.3rem;
+            padding: 18px;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .timer {
+            font-size: 2.5rem;
+            text-align: center;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #e53935;
+        }
+        
+        .score-board {
+            display: flex;
+            justify-content: space-between;
+            background-color: var(--card-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .score-item {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .score-value {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        
+        .score-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .instructions {
+            background-color: var(--card-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .instructions h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 10px;
+        }
+        
+        .game-status {
+            text-align: center;
+            font-size: 1.2rem;
+            margin: 15px 0;
+            color: #666;
+        }
+        
+        .player-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .player-tag {
+            background-color: #e3f2fd;
+            color: var(--primary-color);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        
+        .telegram-info {
+            text-align: center;
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #e8f4fd;
+            border-radius: var(--border-radius);
+            color: #2a7bc1;
+        }
+        
+        .telegram-info a {
+            color: #3390ec;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .word-display {
+                font-size: 2.2rem;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .game-state {
+            display: none;
+        }
+        
+        .game-state.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-comments"></i> Алиас</h1>
+            <p>Объясняйте слова и получайте очки!</p>
+        </header>
+        
+        <div id="startState" class="game-state active">
+            <div class="game-area">
+                <h2>Добро пожаловать в игру Алиас!</h2>
+                <p>Цель игры: объяснять слова своим друзьям, не используя однокоренные слова. За каждое угаданное слово вы получаете 1 очко.</p>
+                
+                <div class="score-board">
+                    <div class="score-item">
+                        <div class="score-value" id="roundCount">1</div>
+                        <div class="score-label">РАУНД</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-value" id="totalScore">0</div>
+                        <div class="score-label">ОЧКОВ</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-value" id="playerCount">1</div>
+                        <div class="score-label">ИГРОКОВ</div>
+                    </div>
+                </div>
+                
+                <div class="player-list">
+                    <div class="player-tag">Вы</div>
+                </div>
+                
+                <div class="game-status">
+                    <p>Нажмите "Начать игру", чтобы начать объяснение слов!</p>
+                </div>
+                
+                <button id="startGame" class="start-btn">
+                    <i class="fas fa-play"></i> Начать игру
+                </button>
+            </div>
+            
+            <div class="instructions">
+                <h3><i class="fas fa-info-circle"></i> Как играть:</h3>
+                <ul>
+                    <li>Объясняйте слово, не используя однокоренные слова</li>
+                    <li>На каждое слово дается 60 секунд</li>
+                    <li>Нажмите "Угадали", если слово отгадано</li>
+                    <li>Нажмите "Пропустить", чтобы перейти к следующему слову</li>
+                    <li>Играйте по очереди с друзьями</li>
+                </ul>
+            </div>
+            
+            <div class="telegram-info">
+                <p><i class="fab fa-telegram"></i> <strong>Для игры в беседе Telegram:</strong></p>
+                <p>Добавьте <a href="https://t.me/alias_game_bot" target="_blank">@alias_game_bot</a> в беседу и начните игру!</p>
+            </div>
+        </div>
+        
+        <div id="gameState" class="game-state">
+            <div class="game-area">
+                <div class="timer" id="timer">60</div>
+                <div class="word-display" id="currentWord">Слово появится здесь</div>
+                
+                <div class="game-status">
+                    <p>Объясните это слово, не используя однокоренные слова!</p>
+                </div>
+                
+                <div class="controls">
+                    <button id="skipWord" class="skip-btn">
+                        <i class="fas fa-forward"></i> Пропустить
+                    </button>
+                    <button id="guessWord" class="success-btn">
+                        <i class="fas fa-check"></i> Угадали
+                    </button>
+                </div>
+            </div>
+            
+            <div class="score-board">
+                <div class="score-item">
+                    <div class="score-value" id="gameScore">0</div>
+                    <div class="score-label">ОЧКОВ В РАУНДЕ</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-value" id="gameWords">0</div>
+                    <div class="score-label">ОБЪЯСНЕНО СЛОВ</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-value" id="gameSkipped">0</div>
+                    <div class="score-label">ПРОПУЩЕНО</div>
+                </div>
+            </div>
+            
+            <div class="game-status">
+                <p>Сейчас объясняет: <strong id="currentPlayer">Вы</strong></p>
+            </div>
+            
+            <button id="endGame" class="start-btn" style="background-color: #e53935;">
+                <i class="fas fa-stop"></i> Завершить раунд
+            </button>
+        </div>
+        
+        <div id="endState" class="game-state">
+            <div class="game-area">
+                <h2>Раунд завершен!</h2>
+                <p>Отличная игра! Вот ваши результаты:</p>
+                
+                <div class="score-board">
+                    <div class="score-item">
+                        <div class="score-value" id="finalScore">0</div>
+                        <div class="score-label">НАБРАНО ОЧКОВ</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-value" id="finalWords">0</div>
+                        <div class="score-label">ОБЪЯСНЕНО СЛОВ</div>
+                    </div>
+                    <div class="score-item">
+                        <div class="score-value" id="finalTime">60</div>
+                        <div class="score-label">ОСТАВШЕЕСЯ ВРЕМЯ</div>
+                    </div>
+                </div>
+                
+                <div class="game-status">
+                    <p>Передайте устройство следующему игроку для нового раунда!</p>
+                </div>
+                
+                <button id="newRound" class="start-btn">
+                    <i class="fas fa-redo"></i> Новый раунд
+                </button>
+                
+                <button id="newGame" class="start-btn" style="background-color: #666; margin-top: 15px;">
+                    <i class="fas fa-home"></i> Вернуться в начало
+                </button>
+            </div>
+        </div>
+    </div>
 
-<div class="ui">
-
-  <div class="ui__background"></div>
-
-  <div class="ui__game"></div>
-
-  <div class="ui__texts">
-    <h1 class="text text--title">
-      <span>THE</span>
-      <span>CUBE</span>
-    </h1>
-    <div class="text text--note">
-      Double tap to start
-    </div>
-    <div class="text text--timer">
-      0:00
-    </div>
-    <div class="text text--complete">
-      <span>Complete!</span>
-    </div>
-    <div class="text text--best-time">
-      <icon trophy></icon>
-      <span>Best Time!</span>
-    </div>
-  </div>
-
-  <div class="ui__prefs">
-    <range name="size" title="Cube Size" list="2,3,4,5"></range>
-    <range name="flip" title="Flip Type" list="Swift&nbsp;,Smooth,Bounce"></range>
-    <range name="scramble" title="Scramble Length" list="20,25,30"></range>
-    <range name="fov" title="Camera Angle" list="Ortographic,Perspective"></range>
-    <range name="theme" title="Color Scheme" list="Cube,Erno,Dust,Camo,Rain"></range>
-  </div>
-
-  <div class="ui__theme">
-    <range name="hue" title="Hue" color></range>
-    <range name="saturation" title="Saturation" color></range>
-    <range name="lightness" title="Lightness" color></range>
-  </div>
-
-  <div class="ui__stats">
-    <div class="stats" name="cube-size">
-      <i>Cube:</i><b>3x3x3</b>
-    </div>
-    <div class="stats" name="total-solves">
-      <i>Total solves:</i><b>-</b>
-    </div>
-    <div class="stats" name="best-time">
-      <i>Best time:</i><b>-</b>
-    </div>
-    <div class="stats" name="worst-time">
-      <i>Worst time:</i><b>-</b>
-    </div>
-    <div class="stats" name="average-5">
-      <i>Average of 5:</i><b>-</b>
-    </div>
-    <div class="stats" name="average-12">
-      <i>Average of 12:</i><b>-</b>
-    </div>
-    <div class="stats" name="average-25">
-      <i>Average of 25:</i><b>-</b>
-    </div>
-  </div>
-
-  <div class="ui__buttons">
-    <button class="btn btn--bl btn--stats">
-      <icon trophy></icon>
-    </button>
-    <button class="btn btn--br btn--prefs">
-      <icon settings></icon>
-    </button>
-    <button class="btn btn--bl btn--back">
-      <icon back></icon>
-    </button>
-    <button class="btn btn--br btn--theme">
-      <icon theme></icon>
-    </button>
-    <button class="btn btn--br btn--reset">
-      <icon reset></icon>
-    </button>
-  </div>
-
-</div>
+    <script>
+        // Инициализация Telegram Web App
+        let tg = window.Telegram?.WebApp;
+        
+        // Игровые переменные
+        let gameState = 'start'; // start, game, end
+        let score = 0;
+        let round = 1;
+        let wordsExplained = 0;
+        let wordsSkipped = 0;
+        let timeLeft = 60;
+        let timerInterval = null;
+        let currentWordIndex = 0;
+        
+        // Список слов для игры (можно расширить)
+        const wordList = [
+            "телефон", "компьютер", "солнце", "океан", "горы", "книга", "музыка", "кино",
+            "спорт", "еда", "путешествие", "дружба", "любовь", "работа", "учёба", "искусство",
+            "животное", "растение", "город", "деревня", "праздник", "мечта", "планы", "воспоминания",
+            "технологии", "наука", "здоровье", "красота", "мода", "автомобиль", "самолёт", "корабль",
+            "время", "пространство", "цвет", "форма", "размер", "температура", "погода", "климат",
+            "эмоция", "чувство", "мысль", "идея", "проект", "цель", "задача", "решение",
+            "команда", "сотрудничество", "соревнование", "победа", "поражение", "успех", "неудача", "опыт"
+        ];
+        
+        // Элементы DOM
+        const startState = document.getElementById('startState');
+        const gameStateEl = document.getElementById('gameState');
+        const endState = document.getElementById('endState');
+        const currentWordEl = document.getElementById('currentWord');
+        const timerEl = document.getElementById('timer');
+        const gameScoreEl = document.getElementById('gameScore');
+        const gameWordsEl = document.getElementById('gameWords');
+        const gameSkippedEl = document.getElementById('gameSkipped');
+        const totalScoreEl = document.getElementById('totalScore');
+        const roundCountEl = document.getElementById('roundCount');
+        const playerCountEl = document.getElementById('playerCount');
+        const finalScoreEl = document.getElementById('finalScore');
+        const finalWordsEl = document.getElementById('finalWords');
+        const finalTimeEl = document.getElementById('finalTime');
+        const currentPlayerEl = document.getElementById('currentPlayer');
+        
+        // Кнопки
+        const startGameBtn = document.getElementById('startGame');
+        const skipWordBtn = document.getElementById('skipWord');
+        const guessWordBtn = document.getElementById('guessWord');
+        const endGameBtn = document.getElementById('endGame');
+        const newRoundBtn = document.getElementById('newRound');
+        const newGameBtn = document.getElementById('newGame');
+        
+        // Инициализация Telegram Web App
+        if (tg) {
+            tg.ready();
+            tg.expand();
+            
+            // Получаем данные пользователя Telegram
+            const user = tg.initDataUnsafe?.user;
+            
+            if (user) {
+                // Если пользователь авторизован, показываем его имя
+                const playerList = document.querySelector('.player-list');
+                const playerTag = document.createElement('div');
+                playerTag.className = 'player-tag';
+                playerTag.textContent = `${user.first_name || 'Игрок'} ${user.last_name || ''}`;
+                playerList.appendChild(playerTag);
+                
+                // Обновляем счетчик игроков
+                playerCountEl.textContent = '1';
+                currentPlayerEl.textContent = user.first_name || 'Вы';
+            }
+        }
+        
+        // Функция для смены состояния игры
+        function setGameState(state) {
+            gameState = state;
+            
+            // Скрываем все состояния
+            startState.classList.remove('active');
+            gameStateEl.classList.remove('active');
+            endState.classList.remove('active');
+            
+            // Показываем нужное состояние
+            if (state === 'start') {
+                startState.classList.add('active');
+            } else if (state === 'game') {
+                gameStateEl.classList.add('active');
+                startGame();
+            } else if (state === 'end') {
+                endState.classList.add('active');
+                showResults();
+            }
+        }
+        
+        // Функция для начала игры
+        function startGame() {
+            // Сброс переменных раунда
+            wordsExplained = 0;
+            wordsSkipped = 0;
+            timeLeft = 60;
+            
+            // Обновление интерфейса
+            gameScoreEl.textContent = '0';
+            gameWordsEl.textContent = '0';
+            gameSkippedEl.textContent = '0';
+            timerEl.textContent = timeLeft;
+            
+            // Выбор случайного слова
+            currentWordIndex = Math.floor(Math.random() * wordList.length);
+            currentWordEl.textContent = wordList[currentWordIndex];
+            
+            // Запуск таймера
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+        
+        // Функция обновления таймера
+        function updateTimer() {
+            timeLeft--;
+            timerEl.textContent = timeLeft;
+            
+            if (timeLeft <= 10) {
+                timerEl.style.color = '#e53935';
+            }
+            
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                setGameState('end');
+            }
+        }
+        
+        // Функция для получения нового случайного слова
+        function getNewWord() {
+            let newIndex;
+            do {
+                newIndex = Math.floor(Math.random() * wordList.length);
+            } while (newIndex === currentWordIndex && wordList.length > 1);
+            
+            currentWordIndex = newIndex;
+            currentWordEl.textContent = wordList[currentWordIndex];
+        }
+        
+        // Функция для показа результатов
+        function showResults() {
+            finalScoreEl.textContent = score;
+            finalWordsEl.textContent = wordsExplained;
+            finalTimeEl.textContent = timeLeft;
+            
+            // Обновляем общий счет
+            totalScoreEl.textContent = score;
+            roundCountEl.textContent = round;
+        }
+        
+        // Обработчики событий
+        startGameBtn.addEventListener('click', () => {
+            setGameState('game');
+        });
+        
+        skipWordBtn.addEventListener('click', () => {
+            wordsSkipped++;
+            gameSkippedEl.textContent = wordsSkipped;
+            getNewWord();
+        });
+        
+        guessWordBtn.addEventListener('click', () => {
+            score++;
+            wordsExplained++;
+            gameScoreEl.textContent = score;
+            gameWordsEl.textContent = wordsExplained;
+            getNewWord();
+        });
+        
+        endGameBtn.addEventListener('click', () => {
+            clearInterval(timerInterval);
+            setGameState('end');
+        });
+        
+        newRoundBtn.addEventListener('click', () => {
+            round++;
+            setGameState('game');
+        });
+        
+        newGameBtn.addEventListener('click', () => {
+            // Сброс всей игры
+            score = 0;
+            round = 1;
+            totalScoreEl.textContent = '0';
+            roundCountEl.textContent = '1';
+            setGameState('start');
+        });
+        
+        // Инициализация
+        totalScoreEl.textContent = score;
+        roundCountEl.textContent = round;
+        
+        // Симуляция добавления игроков для демонстрации
+        setTimeout(() => {
+            if (Math.random() > 0.5) {
+                const playerList = document.querySelector('.player-list');
+                const newPlayer = document.createElement('div');
+                newPlayer.className = 'player-tag';
+                newPlayer.textContent = 'Друг';
+                playerList.appendChild(newPlayer);
+                playerCountEl.textContent = '2';
+            }
+        }, 1000);
+        
+        // Инструкция для Telegram
+        console.log("Для интеграции с Telegram:");
+        console.log("1. Создайте бота через @BotFather");
+        console.log("2. Установите команду /alias для запуска игры");
+        console.log("3. Добавьте бота в беседу для игры с друзьями");
+        console.log("4. Используйте Web App API для открытия этой страницы");
+    </script>
+</body>
+</html>
