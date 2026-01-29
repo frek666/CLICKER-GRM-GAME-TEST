@@ -62,12 +62,85 @@
             font-size: 2.8rem;
             text-align: center;
             font-weight: bold;
-            margin: 30px 0;
+            margin: 20px 0;
             color: var(--primary-color);
             min-height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
+        }
+        
+        .description-area {
+            margin: 25px 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: var(--border-radius);
+            border: 2px dashed #ddd;
+        }
+        
+        .description-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .description-header h3 {
+            margin: 0;
+            color: var(--primary-color);
+        }
+        
+        .word-counter {
+            background-color: #e3f2fd;
+            color: var(--primary-color);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .word-counter.limit-exceeded {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+        
+        .description-input {
+            width: 100%;
+            min-height: 100px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-family: inherit;
+            resize: vertical;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        
+        .description-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        .description-input.limit-exceeded {
+            border-color: #d32f2f;
+            background-color: #fff5f5;
+        }
+        
+        .description-hint {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #666;
+            text-align: center;
+        }
+        
+        .description-example {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e8f5e9;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #2e7d32;
         }
         
         .controls {
@@ -110,13 +183,18 @@
             padding: 18px;
         }
         
-        button:hover {
+        button:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
         
-        button:active {
+        button:active:not(:disabled) {
             transform: translateY(0);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
         
         .timer {
@@ -245,13 +323,45 @@
         .game-state.active {
             display: block;
         }
+        
+        .description-history {
+            margin-top: 30px;
+            background-color: #f9f9f9;
+            border-radius: var(--border-radius);
+            padding: 15px;
+        }
+        
+        .history-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+        }
+        
+        .history-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+        }
+        
+        .history-word {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .history-description {
+            margin-top: 5px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1><i class="fas fa-comments"></i> Очко ебаное</h1>
-            <p>Объясняйте слова и получай в очко!</p>
+            <h1><i class="fas fa-comments"></i> Алиас</h1>
+            <p>Объясняйте слова и получайте очки!</p>
         </header>
         
         <div id="startState" class="game-state active">
@@ -291,6 +401,7 @@
                 <h3><i class="fas fa-info-circle"></i> Как играть:</h3>
                 <ul>
                     <li>Объясняйте слово, не используя однокоренные слова</li>
+                    <li><strong>Напишите объяснение в поле (максимум 5 слов)</strong></li>
                     <li>На каждое слово дается 60 секунд</li>
                     <li>Нажмите "Угадали", если слово отгадано</li>
                     <li>Нажмите "Пропустить", чтобы перейти к следующему слову</li>
@@ -309,15 +420,35 @@
                 <div class="timer" id="timer">60</div>
                 <div class="word-display" id="currentWord">Слово появится здесь</div>
                 
+                <div class="description-area">
+                    <div class="description-header">
+                        <h3><i class="fas fa-edit"></i> Ваше объяснение:</h3>
+                        <div class="word-counter" id="wordCounter">0/5 слов</div>
+                    </div>
+                    <textarea 
+                        id="descriptionInput" 
+                        class="description-input" 
+                        placeholder="Напишите объяснение этого слова (максимум 5 слов). Например, для слова 'яблоко': фрукт, круглое, растет на дереве, бывает красное или зеленое, сочное..."
+                        maxlength="200"
+                    ></textarea>
+                    <div class="description-hint" id="descriptionHint">
+                        <i class="fas fa-lightbulb"></i> Постарайтесь уложиться в 5 слов или меньше
+                    </div>
+                    
+                    <div id="descriptionExample" class="description-example hidden">
+                        <strong>Пример для текущего слова:</strong> <span id="exampleText"></span>
+                    </div>
+                </div>
+                
                 <div class="game-status">
-                    <p>Объясните это слово, не используя однокоренные слова!</p>
+                    <p>Напишите объяснение слова, затем нажмите "Угадали" или "Пропустить"</p>
                 </div>
                 
                 <div class="controls">
                     <button id="skipWord" class="skip-btn">
                         <i class="fas fa-forward"></i> Пропустить
                     </button>
-                    <button id="guessWord" class="success-btn">
+                    <button id="guessWord" class="success-btn" disabled>
                         <i class="fas fa-check"></i> Угадали
                     </button>
                 </div>
@@ -335,6 +466,15 @@
                 <div class="score-item">
                     <div class="score-value" id="gameSkipped">0</div>
                     <div class="score-label">ПРОПУЩЕНО</div>
+                </div>
+            </div>
+            
+            <div class="description-history">
+                <div class="history-title">
+                    <i class="fas fa-history"></i> История объяснений
+                </div>
+                <div id="historyList">
+                    <!-- История будет добавляться здесь -->
                 </div>
             </div>
             
@@ -367,6 +507,15 @@
                     </div>
                 </div>
                 
+                <div class="description-history">
+                    <div class="history-title">
+                        <i class="fas fa-award"></i> Лучшие объяснения раунда
+                    </div>
+                    <div id="bestDescriptions">
+                        <!-- Лучшие объяснения будут здесь -->
+                    </div>
+                </div>
+                
                 <div class="game-status">
                     <p>Передайте устройство следующему игроку для нового раунда!</p>
                 </div>
@@ -395,16 +544,26 @@
         let timeLeft = 60;
         let timerInterval = null;
         let currentWordIndex = 0;
+        let descriptionHistory = [];
+        let wordExamples = {};
         
-        // Список слов для игры (можно расширить)
+        // Список слов для игры с примерами объяснений
         const wordList = [
-            "synolopgy", "компухтер", "Толя", "Юля", "очко", "книга", "музыка", "кино",
-            "обед", "еда", "путешествие на хуй", "дружба", "сука любовь", "работа", "учёба", "искусство",
-            "ты животное", "растение", "город", "колхоз", "праздник", "мечта", "планы", "воспоминания",
-            "технологии", "наука", "здоровье", "соска нереалка", "мода", "тачка автоваз", "самолёт", "корабль",
-            "время", "пространство", "цвет", "форма", "размер", "температура", "проститутка", "климат",
-            "эмоция", "чувство", "мысль", "идея", "проект", "цель", "задача", "решение",
-            "команда", "очки", "соревнование", "победа", "поражение", "успех", "неудача", "опыт"
+            {word: "телефон", example: "устройство, звонки, разговоры, мобильный, связь"},
+            {word: "компьютер", example: "электронное устройство, программы, интернет, клавиатура, экран"},
+            {word: "солнце", example: "звезда, свет, тепло, день, небо"},
+            {word: "океан", example: "вода, море, большой, глубина, волны"},
+            {word: "горы", example: "высокие, вершины, снег, природа, восхождение"},
+            {word: "книга", example: "чтение, страницы, история, автор, библиотека"},
+            {word: "музыка", example: "звуки, мелодия, песня, инструменты, ритм"},
+            {word: "кино", example: "фильм, экран, актеры, сюжет, попкорн"},
+            {word: "спорт", example: "игра, движение, здоровье, соревнования, тренировки"},
+            {word: "еда", example: "продукты, питание, вкус, приготовление, обед"},
+            {word: "путешествие", example: "поездка, отдых, новые места, чемодан, впечатления"},
+            {word: "дружба", example: "отношения, доверие, поддержка, общение, верность"},
+            {word: "любовь", example: "чувство, привязанность, романтика, сердце, отношения"},
+            {word: "работа", example: "деятельность, зарплата, офис, задачи, коллеги"},
+            {word: "учёба", example: "образование, знания, школа, уроки, экзамены"}
         ];
         
         // Элементы DOM
@@ -423,14 +582,26 @@
         const finalWordsEl = document.getElementById('finalWords');
         const finalTimeEl = document.getElementById('finalTime');
         const currentPlayerEl = document.getElementById('currentPlayer');
+        const descriptionInput = document.getElementById('descriptionInput');
+        const wordCounter = document.getElementById('wordCounter');
+        const descriptionHint = document.getElementById('descriptionHint');
+        const descriptionExample = document.getElementById('descriptionExample');
+        const exampleText = document.getElementById('exampleText');
+        const historyList = document.getElementById('historyList');
+        const bestDescriptions = document.getElementById('bestDescriptions');
+        const guessWordBtn = document.getElementById('guessWord');
         
         // Кнопки
         const startGameBtn = document.getElementById('startGame');
         const skipWordBtn = document.getElementById('skipWord');
-        const guessWordBtn = document.getElementById('guessWord');
         const endGameBtn = document.getElementById('endGame');
         const newRoundBtn = document.getElementById('newRound');
         const newGameBtn = document.getElementById('newGame');
+        
+        // Создание словаря примеров
+        wordList.forEach(item => {
+            wordExamples[item.word] = item.example;
+        });
         
         // Инициализация Telegram Web App
         if (tg) {
@@ -454,6 +625,129 @@
             }
         }
         
+        // Функция для подсчета слов в тексте
+        function countWords(text) {
+            if (!text.trim()) return 0;
+            return text.trim().split(/\s+/).length;
+        }
+        
+        // Функция для обновления счетчика слов
+        function updateWordCounter() {
+            const text = descriptionInput.value;
+            const wordCount = countWords(text);
+            
+            wordCounter.textContent = `${wordCount}/5 слов`;
+            
+            if (wordCount > 5) {
+                wordCounter.classList.add('limit-exceeded');
+                descriptionInput.classList.add('limit-exceeded');
+                descriptionHint.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Слишком много слов! Максимум 5 слов.`;
+                descriptionHint.style.color = '#d32f2f';
+                guessWordBtn.disabled = true;
+            } else if (wordCount === 0) {
+                wordCounter.classList.remove('limit-exceeded');
+                descriptionInput.classList.remove('limit-exceeded');
+                descriptionHint.innerHTML = `<i class="fas fa-lightbulb"></i> Постарайтесь уложиться в 5 слов или меньше`;
+                descriptionHint.style.color = '#666';
+                guessWordBtn.disabled = true;
+            } else {
+                wordCounter.classList.remove('limit-exceeded');
+                descriptionInput.classList.remove('limit-exceeded');
+                descriptionHint.innerHTML = `<i class="fas fa-lightbulb"></i> Отлично! ${wordCount} из 5 слов`;
+                descriptionHint.style.color = '#2e7d32';
+                guessWordBtn.disabled = false;
+            }
+        }
+        
+        // Функция для добавления записи в историю
+        function addToHistory(word, description, guessed) {
+            const historyItem = {
+                word,
+                description,
+                guessed,
+                timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            };
+            
+            descriptionHistory.push(historyItem);
+            
+            // Обновляем отображение истории
+            updateHistoryDisplay();
+        }
+        
+        // Функция для обновления отображения истории
+        function updateHistoryDisplay() {
+            historyList.innerHTML = '';
+            
+            // Показываем последние 5 записей
+            const recentHistory = descriptionHistory.slice(-5).reverse();
+            
+            recentHistory.forEach(item => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                
+                const statusIcon = item.guessed ? '<i class="fas fa-check-circle" style="color: #2e7d32; margin-right: 5px;"></i>' : 
+                                                  '<i class="fas fa-forward" style="color: #666; margin-right: 5px;"></i>';
+                
+                historyItem.innerHTML = `
+                    <div>
+                        ${statusIcon} <span class="history-word">${item.word}</span> 
+                        <span style="font-size: 0.8rem; color: #999; margin-left: 10px;">${item.timestamp}</span>
+                    </div>
+                    <div class="history-description">${item.description || 'Объяснение не было введено'}</div>
+                `;
+                
+                historyList.appendChild(historyItem);
+            });
+            
+            // Если история пуста, показываем сообщение
+            if (descriptionHistory.length === 0) {
+                historyList.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">Здесь будут появляться ваши объяснения</div>';
+            }
+        }
+        
+        // Функция для отображения лучших объяснений
+        function showBestDescriptions() {
+            bestDescriptions.innerHTML = '';
+            
+            // Фильтруем угаданные слова
+            const guessedWords = descriptionHistory.filter(item => item.guessed);
+            
+            if (guessedWords.length === 0) {
+                bestDescriptions.innerHTML = '<div style="text-align: center; color: #999; padding: 10px;">Нет угаданных слов в этом раунде</div>';
+                return;
+            }
+            
+            // Сортируем по длине описания (самые короткие и эффективные)
+            const sortedByLength = [...guessedWords].sort((a, b) => {
+                const aWords = a.description ? countWords(a.description) : 0;
+                const bWords = b.description ? countWords(b.description) : 0;
+                return aWords - bWords;
+            });
+            
+            // Показываем топ-3 лучших объяснений
+            const topDescriptions = sortedByLength.slice(0, 3);
+            
+            topDescriptions.forEach((item, index) => {
+                const descriptionItem = document.createElement('div');
+                descriptionItem.className = 'history-item';
+                
+                const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉';
+                
+                descriptionItem.innerHTML = `
+                    <div>
+                        <span style="font-size: 1.2rem; margin-right: 5px;">${medal}</span>
+                        <span class="history-word">${item.word}</span>
+                    </div>
+                    <div class="history-description">${item.description}</div>
+                    <div style="font-size: 0.8rem; color: #666; margin-top: 5px;">
+                        ${item.description ? countWords(item.description) : 0} слова
+                    </div>
+                `;
+                
+                bestDescriptions.appendChild(descriptionItem);
+            });
+        }
+        
         // Функция для смены состояния игры
         function setGameState(state) {
             gameState = state;
@@ -472,6 +766,7 @@
             } else if (state === 'end') {
                 endState.classList.add('active');
                 showResults();
+                showBestDescriptions();
             }
         }
         
@@ -481,16 +776,24 @@
             wordsExplained = 0;
             wordsSkipped = 0;
             timeLeft = 60;
+            descriptionHistory = [];
+            
+            // Очистка поля ввода
+            descriptionInput.value = '';
+            updateWordCounter();
             
             // Обновление интерфейса
             gameScoreEl.textContent = '0';
             gameWordsEl.textContent = '0';
             gameSkippedEl.textContent = '0';
             timerEl.textContent = timeLeft;
+            timerEl.style.color = '#e53935';
+            
+            // Обновление истории
+            updateHistoryDisplay();
             
             // Выбор случайного слова
-            currentWordIndex = Math.floor(Math.random() * wordList.length);
-            currentWordEl.textContent = wordList[currentWordIndex];
+            getNewWord();
             
             // Запуск таймера
             if (timerInterval) clearInterval(timerInterval);
@@ -504,6 +807,11 @@
             
             if (timeLeft <= 10) {
                 timerEl.style.color = '#e53935';
+                timerEl.style.animation = timeLeft <= 5 ? 'pulse 0.5s infinite alternate' : 'none';
+            } else if (timeLeft <= 30) {
+                timerEl.style.color = '#ff9800';
+            } else {
+                timerEl.style.color = '#4caf50';
             }
             
             if (timeLeft <= 0) {
@@ -520,7 +828,21 @@
             } while (newIndex === currentWordIndex && wordList.length > 1);
             
             currentWordIndex = newIndex;
-            currentWordEl.textContent = wordList[currentWordIndex];
+            const currentWordObj = wordList[currentWordIndex];
+            currentWordEl.textContent = currentWordObj.word;
+            
+            // Показываем пример объяснения (с вероятностью 30%)
+            if (Math.random() < 0.3) {
+                exampleText.textContent = currentWordObj.example;
+                descriptionExample.classList.remove('hidden');
+            } else {
+                descriptionExample.classList.add('hidden');
+            }
+            
+            // Очистка поля ввода и сброс счетчика
+            descriptionInput.value = '';
+            updateWordCounter();
+            descriptionInput.focus();
         }
         
         // Функция для показа результатов
@@ -540,12 +862,24 @@
         });
         
         skipWordBtn.addEventListener('click', () => {
+            const currentWord = wordList[currentWordIndex].word;
+            const description = descriptionInput.value.trim();
+            
+            // Добавляем в историю
+            addToHistory(currentWord, description, false);
+            
             wordsSkipped++;
             gameSkippedEl.textContent = wordsSkipped;
             getNewWord();
         });
         
         guessWordBtn.addEventListener('click', () => {
+            const currentWord = wordList[currentWordIndex].word;
+            const description = descriptionInput.value.trim();
+            
+            // Добавляем в историю
+            addToHistory(currentWord, description, true);
+            
             score++;
             wordsExplained++;
             gameScoreEl.textContent = score;
@@ -567,14 +901,39 @@
             // Сброс всей игры
             score = 0;
             round = 1;
+            descriptionHistory = [];
             totalScoreEl.textContent = '0';
             roundCountEl.textContent = '1';
             setGameState('start');
         });
         
+        // Обработчик ввода текста
+        descriptionInput.addEventListener('input', updateWordCounter);
+        
+        // Обработчик нажатия Enter (но только если не Shift+Enter)
+        descriptionInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                if (!guessWordBtn.disabled) {
+                    guessWordBtn.click();
+                }
+            }
+        });
+        
         // Инициализация
         totalScoreEl.textContent = score;
         roundCountEl.textContent = round;
+        updateHistoryDisplay();
+        
+        // Добавляем CSS анимацию для пульсации таймера
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                from { opacity: 1; }
+                to { opacity: 0.5; }
+            }
+        `;
+        document.head.appendChild(style);
         
         // Симуляция добавления игроков для демонстрации
         setTimeout(() => {
